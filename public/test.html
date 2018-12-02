@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8, IE=9, IE=edge" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/public/favicon.png" type="image/x-icon">
+    <title>Main Dashboard </title>
+    <script src="/public/Scripts/jquery-1.12.0.min.js"></script>
+    <link href="/public/Content/bootstrap.css" rel="stylesheet" />
+    <link href="/public/Content/bootstrap-theme.min.css" rel="stylesheet" />
+    <link href="/public/Content/site.css" rel="stylesheet" />  
+    <link href="/public/Content/zGrid.css" rel="stylesheet" />
+    <script>
+        var base_url = '/public/';
+        var controller_url = base_url + 'javascript/';
+    </script>
+    <script type="text/javascript" src="/public/Scripts/zsiLib.js"></script>   
+    <style>
+        .modal-dialog {
+            width: 95%;
+        }
+
+        .ace_editor {
+            min-height: 550px !important;
+        }
+
+        .ace_search.right {
+            position: fixed !important;
+        }
+
+        .ace_search_field {
+            color: #000 !important;
+            background-color: #fff !important;
+        }
+
+        .dhtmlx_wins_body_inner > div[ida='dhxMainCont'] {
+            overflow: auto !important;
+        }
+    </style>   
+</head>
+<body>
+<div class="progressWindow">
+    <div class="loadingImg"></div>
+    <div class="loadingText">Loading...Please wait</div>
+</div>
+<div class="errorWindow">
+    Some processe(s) encountered a problem.
+    <br> Please Contact System Administrator.
+</div>
+ 
+<div class="container-fluid page">
+    
+
+
+<div class="pageTitle">JavaScript Source: Test Page </div>
+<form id="frm">
+    <div class="form-horizontal">
+        <input type="text" id="name" name="name" value="contet-">
+        <input type="hidden" id="source" name="source">
+        <input type="hidden" id="type" name="type" value="js">
+        <div class="form-group  ">
+            <pre id="editor">    </pre>
+        </div>
+    </div>
+
+    <div class="col-xs-12 buttonGroup">
+        <button id="btnSubmit" class="btn btn-primary btn-sm" type="button">
+            <span class="glyphicon glyphicon-floppy-disk"></span> Save
+        </button>
+
+    </div>
+</form>
+<script>
+    var js_id = '1107';
+    var editor = null;
+    var w1 = null;
+
+    $(window).bind('keydown', function (e) {
+        var isCtrlS = (e.ctrlKey && e.which == 83);
+        if (isCtrlS) {
+            submit();
+            e.preventDefault();
+            return false;
+        }
+
+    });
+
+    $(document).ready(function () {
+        initAceEditor();
+
+    });
+
+    $("#btnSubmit").click(function () {
+        submit();
+    });
+    function initAceEditor() {
+
+        ace.require("ace/ext/language_tools");
+        editor = ace.edit("editor");
+        editor.setTheme("ace/theme/monokai");
+        editor.session.setMode("ace/mode/javascript");
+        editor.setAutoScrollEditorIntoView(true);
+
+        editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: false,
+            maxLines: 100,
+            fontSize: "10pt"
+        });
+
+    }
+
+
+    function submit() {
+
+        $("#source").val(editor.getSession().getValue());
+        var data = $("#frm").serializeArray();
+        //$.post(base_url + "javascript/update", data, function (d) {
+        $.post("http://localhost:4000/content", data, function (d) {
+            console.log(data);
+            //$("#js_id").val(d.js_id);
+            zsi.form.showAlert("alert");
+        });
+
+    }
+
+</script>
+
+
+
+
+
+</div>
+<footer class="noprint">
+    <p>&copy; 2018 - Powered By <a href="http://zetta-solutions.net/">ZettaSolutions, Inc. </a></p>
+</footer>
+
+<script src="/public/ace/src-noconflict/ace.js"></script>
+<script src="/public/ace/src-noconflict/ext-language_tools.js"></script>
+<script src="/public/Scripts/bootstrap.min.js"></script>
+<div class="alert alert-success">
+    <p>Data has been saved.</p>
+</div>
+</body>
+</html>
+

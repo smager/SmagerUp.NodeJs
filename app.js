@@ -3,8 +3,7 @@ const app =  express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const pageRoutes  =  require('./api/routes/page');
-const jsRoutes  =  require('./api/routes/javascript');
+const contentRoutes  =  require('./api/routes/content');
 
 mongoose.connect('mongodb://localhost/node-smager-up',
   {
@@ -15,12 +14,12 @@ var db = mongoose.connection;
 db.once('open', function(){
   console.log('connected to MongoDB');
 });
-db.once('error',function(){
-  console.log(err);
+db.once('error',function(err){
+  console.log("Database connection error message:",err);
 });
 
 app.use(morgan('dev'));
-app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.urlencoded({limit: '100mb', extended: true})) 
 app.use(bodyParser.json());
 
 app.use((req,res,next)=> {
@@ -38,9 +37,8 @@ app.use((req,res,next)=> {
 });
 
 //Routes which should handle request
-app.use('/page',  pageRoutes );
-app.use('/js',  jsRoutes );
-
+app.use('/content',  contentRoutes );
+app.use('/public',express.static('public'));
 
 app.use((req,res,next)=> {
   const error  = new Error('Not found');
