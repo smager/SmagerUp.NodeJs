@@ -17,12 +17,12 @@ router.get('/',(req,res,next)=> {
  
 });
 
-router.get('/:ContentId',(req,res,next)=> {
-    const id =  req.params.ContentId;
-    Content.findById(id)
+router.get('/:name',(req,res,next)=> {
+    const _name =  req.params.name;
+    Content.find( {name:_name}) 
         .exec()
-        .then( doc =>{
-            res.status(200).json(doc);
+        .then( d =>{
+            res.status(200).send( d[0].source || null );
         })
         .catch( err=>{
             console.log(err);
@@ -77,5 +77,11 @@ router.post('/',(req,res,next)=> {
             res.status(500).json({error:err});
         });
 });
+
+router.get('/js',(req,res,next)=> {
+    res.status(200).json({msg:"this is js content"});
+});
+
+
 
  module.exports = router;

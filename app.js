@@ -3,7 +3,19 @@ const app =  express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const contentRoutes  =  require('./api/routes/content');
+const hbs = require("express-handlebars");
+const path =  require("path");
+
+var contentRoutes  =  require('./api/routes/content');
+var jsRoutes  =  require('./api/routes/javascript');
+var pgRoutes  =  require('./api/routes/page');
+
+global.appName = "Node-SmagerUp";
+
+//view engin setup
+app.engine("hbs",hbs({extname:"hbs",defaultLayout:"layout",layoutsDir: __dirname + "/views/layouts/"}));
+app.set("views",path.join(__dirname,"views"));
+app.set("view engine","hbs");
 
 mongoose.connect('mongodb://localhost/node-smager-up',
   {
@@ -38,7 +50,14 @@ app.use((req,res,next)=> {
 
 //Routes which should handle request
 app.use('/content',  contentRoutes );
+app.use('/js',  jsRoutes );
+app.use('/pg',  pgRoutes );
+
 app.use('/public',express.static('public'));
+
+app.use('/',(req,res,next)=> {  
+   res.render("home",{ layout: 'home-layout',appName:appName });   
+});
 
 app.use((req,res,next)=> {
   const error  = new Error('Not found');
