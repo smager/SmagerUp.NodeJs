@@ -4,7 +4,7 @@ const Content = require('../models/content');
 
  
 router.get('/',(req,res,next)=> {
-    res.render("page/index",{title:"Page - index"});
+    res.render("page/index",{title:"Pages"});
 });
 
 router.get('/:name',(req,res,next)=> {
@@ -13,9 +13,11 @@ router.get('/:name',(req,res,next)=> {
         .exec()
         .then( d =>{
            var _info = d[0];
-           _info.title= _info.name;
-           _info.appName = appName;
-            res.render("page/name",_info);
+           if( _info){
+            _info.title= _info.name;
+            _info.appName = appName;
+                res.render("page/name",_info);
+           }else res.render("page/notfound",{pageName:_name});
         })
         .catch( err=>{
             console.log(err);

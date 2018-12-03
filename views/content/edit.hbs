@@ -1,0 +1,64 @@
+<form id="frm">
+    <div class="form-horizontal">
+        <input type="hidden" id="name" name="name" value="{{name}}">
+        <input type="hidden" id="source" name="source" value="smager">
+        <input type="hidden" id="type" name="type" value="{{type}}">
+        <div class="form-group  ">
+            <pre id="editor">{{source}}</pre>
+        </div>
+    </div>
+    <div class="col-xs-12 buttonGroup">
+        <button id="btnSubmit" class="btn btn-primary btn-sm" type="button">
+            <span class="glyphicon glyphicon-floppy-disk"></span> Save
+        </button>
+
+    </div>
+</form>
+<script>
+    var editor = null;
+    var w1 = null;
+
+    $(window).bind('keydown', function (e) {
+        var isCtrlS = (e.ctrlKey && e.which == 83);
+        if (isCtrlS) {
+            submit();
+            e.preventDefault();
+            return false;
+        }
+
+    });
+
+    $(document).ready(function () {
+        initAceEditor();
+
+    });
+
+    $("#btnSubmit").click(function () {
+        submit();
+    });
+    function initAceEditor() {
+
+        ace.require("ace/ext/language_tools");
+        editor = ace.edit("editor");
+        editor.setTheme("ace/theme/monokai");
+        editor.session.setMode("ace/mode/{{aceSourceType}}");
+        editor.setAutoScrollEditorIntoView(true);
+
+        editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: false,
+            maxLines: 100,
+            fontSize: "10pt"
+        });
+
+    }
+    function submit() {
+        $("#source").val(editor.getSession().getValue());
+        var data = $("#frm").serializeArray();
+        $.post("{{baseURL}}/content", data, function (d) {
+            console.log(data);
+            zsi.form.showAlert("alert");
+        });
+    }
+</script>

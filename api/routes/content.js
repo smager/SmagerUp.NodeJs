@@ -1,14 +1,41 @@
-const express  = require('express');
-const router = express.Router();
-const Content = require('../models/content');
+var express  = require('express');
+var router = express.Router();
+var content = require('../models/content');
 const mongoose  = require('mongoose');
 
+//functions:
+function edit(req,res){
+    var _name =  req.params.name;
+    var _type =  req.params.type || "html";
+    content.find( {name:_name, type: _type}) 
+        .exec()
+        .then( d =>{
+           var _info = d[0] || { name: _name, type: _type, source:"no " + _type + " source yet."} ;
+           _info.title= _info.name;
+           _info.appName = appName;
+           _info.layout ="edit-content";
+           _info.aceSourceType = (_type =="js" ?"javascript" : _type  );
+           _info.baseURL = req.protocol + '://' + req.get('host');
+            res.render("content/edit",_info);
+        })
+        .catch( err=>{
+            res.status(500).json({error:err});
+        });
+}
+function sendError(res,err){
+    console.log("error",err);
+    res.status(500).json({errorMsg:err + ""});
+}
+
+//get page list
 router.get('/',(req,res,next)=> {
     Content.find()
         .exec()
         .then(docs=>{
-            console.log(docs);
-            res.status(200).json(docs);
+            //console.log(docs);
+            //res.status(200).json(docs);
+            res.render("content/list");
+
         })
         .catch(err=>{
             console.log(err);
@@ -16,72 +43,45 @@ router.get('/',(req,res,next)=> {
         });
  
 });
-
-router.get('/:name',(req,res,next)=> {
-    const _name =  req.params.name;
-    Content.find( {name:_name}) 
-        .exec()
-        .then( d =>{
-            res.status(200).send( d[0].source || null );
-        })
-        .catch( err=>{
-            console.log(err);
-            res.status(500).json({error:err});
-        });
+//get page name
+router.get('/:name',(req,res)=> {
+    edit(req,res);
 });
-
-
-router.patch('/:ContentId',(req,res,next)=> {   
-    Content.update({_id:req.params.ContentId}, {$set: req.body}  )
-    .exec()
-   .then( result =>{
-       console.log("data has been updated.");
-       res.status(200).json(result);
-   })
-   .catch(err =>{
-       console.log(err);
-       res.status(500).json({error:err});
-   });
- });
-
- router.delete('/:ContentId',(req,res,next)=> {
-    Content.remove({_id:req.params.ContentId})
-    .exec()
-    .then( result =>{
-        res.status(200).json(result);
-    })
-    .catch(err =>{
-        console.log(err);
-        res.status(500).json({error:err});
-    });
- });
+//get page name with type
+router.get('/:name/:type',(req,res)=> {
+    edit(req,res);
+});
 
 router.post('/',(req,res,next)=> {
-    const content =  new Content({
-        _id : new mongoose.Types.ObjectId()
-        ,name: req.body.name
-        ,source: req.body.source
-        ,type:req.body.type
-    });
-    content
-        .save()
-        .then(result =>{
-            console.log(result);
-            res.status(201).json({
-                message:"handling POST request",
-                result : result
+    var _info = req.body;
+    content.find( {name:_info.name, type:_info.type}) 
+    .exec()
+    .then( d =>{
+        if(d.length > 0){
+            //found content
+            content.update({name:_info.name,type:_info.type}, {$set: req.body})
+           .exec()
+           .then( result =>{
+                res.status(201).json({msg:msgDataSave, result : result});
+           })
+           .catch( err=>{ sendError(res,err);});           
+        }else{
+            //not found content
+            const _content =  new content({
+                _id : new mongoose.Types.ObjectId()
+                ,name: _info.name
+                ,source: _info.source
+                ,type:_info.type
             });
-        })
-        .catch( err =>{
-            console.log(err);
-            res.status(500).json({error:err});
-        });
+            _content.save()
+            .then(result =>{
+                res.status(201).json({msg:msgDataSave, result : result});
+            })
+            .catch( err=>{ sendError(res,err);});
+        }
+
+    })
+    .catch( err=>{ sendError(res,err);});
 });
 
-router.get('/js',(req,res,next)=> {
-    res.status(200).json({msg:"this is js content"});
-});
-
-
-
- module.exports = router;
+module.exports = router;

@@ -11,6 +11,7 @@ var jsRoutes  =  require('./api/routes/javascript');
 var pgRoutes  =  require('./api/routes/page');
 
 global.appName = "Node-SmagerUp";
+global.msgDataSave ="Data has been saved.";
 
 //view engin setup
 app.engine("hbs",hbs({extname:"hbs",defaultLayout:"layout",layoutsDir: __dirname + "/views/layouts/"}));
@@ -59,12 +60,12 @@ app.use('/',(req,res,next)=> {
    res.render("home",{ layout: 'home-layout',appName:appName });   
 });
 
+/*
 app.use((req,res,next)=> {
   const error  = new Error('Not found');
   error.status=404;
   next(error);
 });
-
 app.use((error,req,res,next)=> {
   res.status(error.status || 500);
   res.json({
@@ -73,6 +74,6 @@ app.use((error,req,res,next)=> {
     }
   }); 
 });
-
+*/
 
 module.exports = app;
