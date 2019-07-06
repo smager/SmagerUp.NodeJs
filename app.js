@@ -13,7 +13,7 @@ var pgRoutes  =  require('./api/routes/page');
 global.appName = "Node-SmagerUp";
 global.msgDataSave ="Data has been saved.";
 
-//view engin setup
+//view engine setup
 app.engine("hbs",hbs({extname:"hbs",defaultLayout:"layout",layoutsDir: __dirname + "/views/layouts/"}));
 app.set("views",path.join(__dirname,"views"));
 app.set("view engine","hbs");

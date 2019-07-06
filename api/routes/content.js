@@ -29,12 +29,12 @@ function sendError(res,err){
 
 //get page list
 router.get('/',(req,res,next)=> {
-    Content.find()
+    content.find()
         .exec()
         .then(docs=>{
             //console.log(docs);
-            //res.status(200).json(docs);
-            res.render("content/list");
+            res.status(200).json(docs);
+            //res.render("content/list");
 
         })
         .catch(err=>{
@@ -66,18 +66,28 @@ router.post('/',(req,res,next)=> {
            })
            .catch( err=>{ sendError(res,err);});           
         }else{
-            //not found content
-            const _content =  new content({
-                _id : new mongoose.Types.ObjectId()
-                ,name: _info.name
-                ,source: _info.source
-                ,type:_info.type
-            });
-            _content.save()
-            .then(result =>{
-                res.status(201).json({msg:msgDataSave, result : result});
+            //not found content            
+            content.find( {name:_info.name, type:"html"}) 
+            .exec()
+            .then(d2 => {
+                const _content =  new content({
+                    _id     : new mongoose.Types.ObjectId()
+                    ,name   : _info.name
+                    ,source : _info.source
+                    ,type   :_info.type
+                });
+                if(d2.length > 0){
+                    _content.page = d2[0]._id;
+                }
+                _content.save()
+                .then(result =>{
+                    res.status(201).json({msg:msgDataSave, result : result});
+                })
+                .catch( err=>{ sendError(res,err);});
             })
             .catch( err=>{ sendError(res,err);});
+
+            
         }
 
     })

@@ -4,6 +4,8 @@ const ContentSchema = mongoose.Schema({
      name:String
     ,source:String
     ,type:String
+    ,page:{type:mongoose.Schema.Types.ObjectId, ref : "Content"}
+    ,links:[]
 });
 
 module.exports = mongoose.model('Content',ContentSchema);
